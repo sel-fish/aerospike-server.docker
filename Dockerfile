@@ -4,21 +4,18 @@
 # http://github.com/aerospike/aerospike-server.docker
 #
 
-FROM ubuntu:xenial
+FROM centos6-base
 
-ENV AEROSPIKE_VERSION 3.8.2.3
-ENV AEROSPIKE_SHA256 f22f6737156692bbfb9dd0e8f0e410817cc5a503974d45d896065345f099072b         
+ENV AEROSPIKE_VERSION 3.8.3
+
+COPY aerospike-server-community-$AEROSPIKE_VERSION-el6.tgz /tmp/aerospike-server.tgz
 
 # Install Aerospike
-
 RUN \
-  apt-get update -y \
-  &&  apt-get install -y wget logrotate ca-certificates \
-  && wget "https://www.aerospike.com/artifacts/aerospike-server-community/${AEROSPIKE_VERSION}/aerospike-server-community-${AEROSPIKE_VERSION}-ubuntu14.04.tgz" -O aerospike-server.tgz \
-  && echo "$AEROSPIKE_SHA256 *aerospike-server.tgz" | sha256sum -c - \
+  yum install -y logrotate ca-certificates tar \
   && mkdir aerospike \
-  && tar xzf aerospike-server.tgz --strip-components=1 -C aerospike \
-  && dpkg -i aerospike/aerospike-server-*.deb \
+  && tar xzf /tmp/aerospike-server.tgz --strip-components=1 -C aerospike \
+  && rpm -ivh aerospike/aerospike-server-*.rpm \
   && mkdir -p /var/log/aerospike/ \
   && mkdir -p /var/run/aerospike/ \
   && rm -rf aerospike-server.tgz aerospike /var/lib/apt/lists/*
